@@ -1,0 +1,1655 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Mythos Pac — Leyendas de Colombia</title>
+<meta name="description" content="Pac-Man con temática de mitos y leyendas colombianas: guía al Chamán, recoge las 346 ofrendas y escapa de El Chupacabras, La Cueruda, El Duende, La Chiva y El Mohán.">
+<meta name="theme-color" content="#150c33">
+<meta name="color-scheme" content="dark">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mythos Pac">
+<meta name="application-name" content="Mythos Pac">
+<style>
+  :root{
+    --bg:#06030f;
+    --panel:#150c33;
+    --panel2:#1d1145;
+    --line:#3a2a72;
+    --gold:#ffcc4d;
+    --gold2:#ff9f1c;
+    --text:#f3e9ff;
+    --muted:#a394d1;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;min-height:100%;overscroll-behavior:none;}
+  body{
+    background:
+      radial-gradient(1100px 700px at 15% -10%, #2d1a63 0%, transparent 60%),
+      radial-gradient(900px 600px at 110% 15%, #43114e 0%, transparent 55%),
+      linear-gradient(180deg,#0a0618 0%, #120a2b 55%, #08040f 100%);
+    background-attachment:fixed;
+    color:var(--text);
+    font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;
+    display:flex; flex-direction:column; align-items:center;
+    padding:
+      calc(16px + env(safe-area-inset-top))
+      calc(10px + env(safe-area-inset-right))
+      calc(34px + env(safe-area-inset-bottom))
+      calc(10px + env(safe-area-inset-left));
+    min-height:100vh;
+  }
+  header{text-align:center; margin-bottom:12px;}
+  h1{
+    margin:0;
+    font-size:clamp(24px,5vw,40px);
+    letter-spacing:3px;
+    text-transform:uppercase;
+    background:linear-gradient(92deg,#ffd873,#fffbe8 35%,#ff9f1c 75%,#ffd873);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    filter:drop-shadow(0 0 18px rgba(255,170,50,.35));
+  }
+  .sub{margin:6px 0 0; color:var(--muted); font-size:13px; letter-spacing:.5px;}
+  .sub b{color:var(--gold)}
+
+  .wrap{display:flex; gap:20px; align-items:flex-start; justify-content:center; flex-wrap:wrap; width:100%; max-width:1080px;}
+
+  .stage{
+    position:relative;
+    background:#04020c;
+    border:2px solid var(--line);
+    border-radius:16px;
+    padding:8px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.03) inset,
+      0 24px 60px rgba(0,0,0,.65),
+      0 0 60px rgba(110,60,220,.18);
+    line-height:0;
+    flex:0 0 auto;
+    max-width:100%;
+  }
+  canvas{
+    display:block; border-radius:10px; background:#04020c;
+    width:672px; max-width:100%; height:auto;
+    touch-action:none;
+  }
+
+  .overlay{
+    position:absolute; inset:8px; border-radius:10px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:12px; text-align:center; padding:22px;
+    background:rgba(6,3,15,.9);
+    -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px);
+    line-height:1.5;
+    z-index:5;
+  }
+  .overlay.hidden{display:none;}
+  .overlay h2{
+    margin:0; font-size:clamp(24px,4vw,34px); text-transform:uppercase; letter-spacing:2px;
+    color:var(--gold); text-shadow:0 0 24px rgba(255,170,50,.45);
+  }
+  .overlay p{margin:0; max-width:420px; color:#cdbdf0; font-size:14px;}
+  .overlay .big{font-size:17px; color:#fff;}
+  .overlay .tag{font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--muted);}
+
+  .btn{
+    margin-top:4px; padding:12px 30px; border:none; border-radius:999px; cursor:pointer;
+    font-family:inherit; font-weight:800; font-size:15px; letter-spacing:1.5px; text-transform:uppercase;
+    color:#2a1400;
+    background:linear-gradient(180deg,#ffe08a,#ff9f1c);
+    box-shadow:0 6px 0 #9c5a00, 0 12px 24px rgba(255,150,20,.3);
+    transition:transform .07s, box-shadow .07s, filter .15s;
+  }
+  .btn:hover{filter:brightness(1.06);}
+  .btn:active{transform:translateY(4px); box-shadow:0 2px 0 #9c5a00;}
+
+  .toast{
+    position:absolute; left:50%; top:20%; z-index:4;
+    transform:translate(-50%,-50%) scale(.7);
+    font-size:clamp(15px,2.6vw,23px); font-weight:800; letter-spacing:1.5px;
+    text-transform:uppercase; color:#fff; opacity:0; pointer-events:none;
+    white-space:nowrap; transition:opacity .18s, transform .18s;
+    line-height:1.2;
+  }
+  .toast.show{opacity:1; transform:translate(-50%,-50%) scale(1);}
+
+  .side{width:308px; display:flex; flex-direction:column; gap:12px;}
+  .card{
+    background:linear-gradient(180deg,var(--panel),var(--panel2));
+    border:1px solid var(--line); border-radius:14px; padding:13px 15px;
+    box-shadow:0 12px 28px rgba(0,0,0,.35);
+  }
+  .card h3{
+    margin:0 0 9px; font-size:11px; letter-spacing:2.5px; text-transform:uppercase;
+    color:var(--gold); font-weight:700;
+  }
+  .stat{display:flex; justify-content:space-between; align-items:center; font-size:14px; padding:5px 0; border-bottom:1px dashed rgba(255,255,255,.06);}
+  .stat:last-child{border-bottom:none;}
+  .stat span:last-child{color:var(--gold); font-weight:800; font-variant-numeric:tabular-nums;}
+  .bar{height:9px; background:#0b0620; border:1px solid var(--line); border-radius:999px; overflow:hidden; margin:11px 0 6px;}
+  .bar > i{display:block; height:100%; width:0%; background:linear-gradient(90deg,#ff4d6d,#ff9f1c,#ffd873); transition:width .2s ease;}
+  .lvl{display:flex; justify-content:space-between; font-size:11.5px; color:var(--muted);}
+
+  .mythlist{max-height:214px; overflow:auto; font-size:12px; color:#c9b9ee; padding-right:4px;}
+  .mythlist::-webkit-scrollbar{width:6px;}
+  .mythlist::-webkit-scrollbar-thumb{background:#3d2b7a; border-radius:9px;}
+  .mythlist div{padding:6px 0; border-bottom:1px dashed rgba(255,255,255,.055);}
+  .mythlist div:last-child{border-bottom:none;}
+  .mythlist b{display:block; color:#ffd873; font-size:12.5px; margin-bottom:1px;}
+  .mythlist i{color:#9d8bcb; font-style:italic; line-height:1.35; display:block;}
+
+  .legend{display:flex; flex-wrap:wrap; gap:7px 12px; font-size:11.5px;}
+  .chip{display:flex; align-items:center; gap:5px; color:var(--muted);}
+  .chip i{width:11px; height:11px; border-radius:50%; display:inline-block; box-shadow:0 0 7px currentColor;}
+
+  .keys{display:grid; grid-template-columns:auto 1fr; gap:6px 10px; font-size:12.5px; color:var(--muted); align-items:center;}
+  kbd{
+    background:#2b1f5c; border:1px solid #4a378f; border-bottom-width:3px;
+    border-radius:6px; padding:2px 8px; font-family:inherit; font-size:11px; color:#fff; text-align:center;
+  }
+  .row2{display:flex; gap:8px; margin-top:10px;}
+  .mini{
+    flex:1; padding:9px; border-radius:10px; cursor:pointer; font-family:inherit;
+    background:#1d1450; color:#d9ccff; border:1px solid var(--line); font-size:12px; letter-spacing:.5px;
+    transition:background .15s;
+  }
+  .mini:hover{background:#2a1d6b;}
+
+  .touch{display:none; grid-template-columns:repeat(3,58px); gap:8px; justify-content:center; margin-top:14px;}
+  .touch button{
+    padding:15px 0; font-size:19px; border-radius:14px; border:1px solid var(--line);
+    background:#1d1450; color:#fff; cursor:pointer; font-family:inherit;
+    box-shadow:0 4px 0 #0b0620;
+  }
+  .touch button:active{background:#2d2069; transform:translateY(3px); box-shadow:0 1px 0 #0b0620;}
+  .touch .sp{visibility:hidden;}
+
+  @media (max-width: 1040px){
+    .side{width:100%; max-width:672px;}
+    .side{display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:start;}
+    .card.span2{grid-column:1/-1;}
+  }
+  @media (max-width: 720px){
+    body{padding:10px 6px 24px;}
+    .side{grid-template-columns:1fr;}
+    .touch{display:grid;}
+    .mythlist{max-height:150px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Mythos Pac</h1>
+  <p class="sub">Los pasillos del <b>Valle de las Leyendas</b> · Devora los espíritus · Huye del <b>Chupacabras</b></p>
+</header>
+
+<div class="wrap">
+  <div class="stage">
+    <canvas id="game" width="672" height="696"></canvas>
+
+    <div class="overlay" id="overlay">
+      <div class="tag">Un arcade de mitos y leyendas</div>
+      <h2 id="ovTitle">Mythos Pac</h2>
+      <p id="ovText">El Chamán desciende al Valle de las Leyendas. Devora las 346 ofrendas antes de que los espíritus te atrapen.</p>
+      <button class="btn" id="ovBtn">Jugar</button>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <aside class="side">
+    <div class="card">
+      <h3>Marcador</h3>
+      <div class="stat"><span>Puntos</span><span id="sPts">0</span></div>
+      <div class="stat"><span>Récord</span><span id="sBest">0</span></div>
+      <div class="stat"><span>Vidas</span><span id="sLives">3</span></div>
+      <div class="stat"><span>Nivel</span><span id="sLvl">1</span></div>
+      <div class="stat"><span>Ofrendas comidas</span><span id="sFruit">0</span></div>
+      <div class="bar"><i id="lvlBar"></i></div>
+      <div class="lvl"><span>Ofrendas restantes</span><span id="sLeft">0</span></div>
+    </div>
+
+    <div class="card span2">
+      <h3>Bestiario del Valle</h3>
+      <div class="mythlist" id="mythList"></div>
+    </div>
+
+    <div class="card">
+      <h3>Controles</h3>
+      <div class="keys">
+        <kbd>← ↑ ↓ →</kbd><span>Mover al Chamán</span>
+        <kbd>W A S D</kbd><span>También sirve</span>
+        <kbd>P</kbd><span>Pausa</span>
+        <kbd>M</kbd><span>Silenciar</span>
+      </div>
+      <div class="row2">
+        <button class="mini" id="btnPause">Pausa</button>
+        <button class="mini" id="btnMute">🔊 Sonido</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>En el laberinto</h3>
+      <div class="legend">
+        <div class="chip" style="color:#ffd24d"><i style="background:#ffd24d"></i>El Chamán</div>
+        <div class="chip" style="color:#ff4d6d"><i style="background:#ff4d6d"></i>Sapo del Chocó</div>
+        <div class="chip" style="color:#ff9f1c"><i style="background:#ff9f1c"></i>La Cueruda</div>
+        <div class="chip" style="color:#4dd2ff"><i style="background:#4dd2ff"></i>El Duende</div>
+        <div class="chip" style="color:#c77dff"><i style="background:#c77dff"></i>La Chiva</div>
+        <div class="chip" style="color:#7dff8a"><i style="background:#7dff8a"></i>El Mohán</div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div class="touch">
+  <button class="sp"></button>
+  <button data-dir="up">▲</button>
+  <button class="sp"></button>
+  <button data-dir="left">◀</button>
+  <button data-dir="down">▼</button>
+  <button data-dir="right">▶</button>
+</div>
+
+<script>
+"use strict";
+/* =========================================================================
+   MYTHOS PAC — Pac-Man con mitología y leyendas colombianas
+   ========================================================================= */
+
+/* ------------------------- LABERINTO ------------------------- */
+// # muro | . ofrenda | o ofrenda dorada | - puerta | (espacio) casa del Mohán
+const MAP = [
+  "############################",
+  "#............##............#",
+  "#.####.#####.##.#####.####.#",
+  "#o####.#####.##.#####.####o#",
+  "#.####.#####.##.#####.####.#",
+  "#..........................#",
+  "#.####.##.########.##.####.#",
+  "#......##....##....##......#",
+  "######.#####.##.#####.######",
+  "#......##....##....##......#",
+  "#.####.##.########.##.####.#",
+  "#............##............#",
+  "#.####.#####.##.#####.####.#",
+  "#.####.#####.##.#####.####.#",
+  "#.####.#####.##.#####.####.#",
+  "............................",
+  "#.####.##.###--###.##.####.#",
+  "#......##..      ..##......#",
+  "######.####      ####.######",
+  "#......##..######..##......#",
+  "#.####.##.########.##.####.#",
+  "#............##............#",
+  "#.####.#####.##.#####.####.#",
+  "#o..##.......##.......##..o#",
+  "###.##.##.########.##.##.###",
+  "#......##....##....##......#",
+  "#.##########.##.##########.#",
+  "#..........................#",
+  "############################"
+];
+
+const COLS = 28, ROWS = 29, TILE = 24;
+const W = COLS * TILE, H = ROWS * TILE;
+
+const DOOR_TX = 13, DOOR_TY = 16;     // casilla de la puerta
+const HOUSE_EXIT = { x: 13, y: 15 };  // casilla sobre la puerta
+const HOUSE_CENTER = { x: 13, y: 17 };
+const PAC_START = { x: 12, y: 21, dir: "left" };
+const FRUIT_TILE = { x: 13, y: 15 };
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+/* ------------------------- ESTADO DEL MAPA ------------------------- */
+const walls  = [];   // true = muro
+const doors  = [];   // true = puerta
+const houses = [];   // true = interior casa
+const dots   = [];   // 0 nada, 1 ofrenda, 2 dorada
+
+for (let y = 0; y < ROWS; y++) {
+  walls[y] = []; doors[y] = []; houses[y] = []; dots[y] = [];
+  for (let x = 0; x < COLS; x++) {
+    const c = MAP[y][x];
+    walls[y][x]  = c === "#";
+    doors[y][x]  = c === "-";
+    houses[y][x] = c === " ";
+    dots[y][x]   = c === "." ? 1 : c === "o" ? 2 : 0;
+  }
+}
+
+let totalDots = 0, eatenDots = 0, dotsLeft = 0;
+function countDots() {
+  let n = 0;
+  for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) if (dots[y][x]) n++;
+  return n;
+}
+totalDots = countDots();
+dotsLeft = totalDots;
+
+/* ------------------------- DIRECCIONES ------------------------- */
+const DIRV = {
+  up:    { x: 0, y: -1 },
+  left:  { x: -1, y: 0 },
+  down:  { x: 0, y: 1 },
+  right: { x: 1, y: 0 }
+};
+const OPP = { up: "down", down: "up", left: "right", right: "left" };
+const DIR_ORDER = ["up", "left", "down", "right"];
+
+const wrapX = x => (x < 0 ? x + COLS : x >= COLS ? x - COLS : x);
+
+function wallAt(x, y) {
+  if (y < 0 || y >= ROWS) return true;
+  return walls[y][wrapX(x)];
+}
+
+// para dibujar: fuera del tablero NO es muro (así se perfila el borde exterior)
+function wallAtDraw(x, y) {
+  if (y < 0 || y >= ROWS || x < 0 || x >= COLS) return false;
+  return walls[y][x];
+}
+
+/* ------------------------- LEYENDAS ------------------------- */
+const BESTIARY = [
+  { name: "El Chupacabras",
+    desc: "El cazador de las sierras. Persigue al Chamán sin descanso y es el más rápido del valle.",
+    color: "#ff4d6d" },
+  { name: "La Cueruda de la Sierra",
+    desc: "Mujer de cabellera larga que aparece en los caminos. Se adelanta a tu rumbo para emboscarte.",
+    color: "#ff9f1c" },
+  { name: "El Duende de Tequendama",
+    desc: "Pequeño guardián del salto del río. Conoce tus pasos y salta a tu lado más débil.",
+    color: "#4dd2ff" },
+  { name: "La Chiva",
+    desc: "Bruja que vuela en su cabra. Persigue de cerca, pero se esconde si te acercas demasiado.",
+    color: "#c77dff" },
+  { name: "El Mohán",
+    desc: "Dueño de las cavernas y del oro de los ríos. Ronda sin rumbo fijo, siempre al acecho.",
+    color: "#7dff8a" },
+  { name: "La Patasola",
+    desc: "La dama de un solo pie que baila en los montes. Dicen que quien la escucha, se pierde.",
+    color: "#ffd24d" },
+  { name: "El Mohán de Zipaquirá",
+    desc: "Bajo la catedral de sal duerme un ser de piedra. Si despierta, la tierra tiembla.",
+    color: "#7dff8a" },
+  { name: "El Dorado",
+    desc: "La ciudad de oro que se hunde en el río. Buscarla es perderse; hallarla, no volver.",
+    color: "#ffe066" },
+  { name: "La Candelaria",
+    desc: "En Pasto los matachines danzan con fuego. La candela ahuyenta a los malos espíritus.",
+    color: "#ff7ad9" },
+  { name: "El Hojarasquín del Monte",
+    desc: "Un hombre de hojas y ramas que cuida el bosque. Asusta a los cazadores y a los necios.",
+    color: "#8ce99a" }
+];
+
+const OFRENDAS = [
+  { icon: "🕯️", name: "Vela de Candelaria", points: 100 },
+  { icon: "🌽", name: "Maíz del Mohán", points: 200 },
+  { icon: "☕", name: "Café de la Sierra", points: 300 },
+  { icon: "🦋", name: "Mariposa amarilla", points: 500 },
+  { icon: "💰", name: "Oro de El Dorado", points: 800 }
+];
+
+/* ------------------------- ENTIDADES ------------------------- */
+const pac = {
+  tx: PAC_START.x, ty: PAC_START.y, dir: PAC_START.dir, desired: null,
+  prog: 0, mouth: 0, speed: 7.15, deathT: 0
+};
+
+const GHOST_DEFS = [
+  { id: "chupacabras", name: "El Chupacabras", color: "#ff4d6d", kind: "spike",
+    personality: "chaser",    scatter: { x: 25, y: 1 },  speed: 6.15, release: 2.4 },
+  { id: "cueruda",     name: "La Cueruda",     color: "#ff9f1c", kind: "hair",
+    personality: "ambusher",  scatter: { x: 2,  y: 1 },  speed: 5.85, release: 4.5 },
+  { id: "duende",      name: "El Duende",      color: "#4dd2ff", kind: "hat",
+    personality: "flanker",   scatter: { x: 25, y: 27 }, speed: 5.8,  release: 7.5 },
+  { id: "chiva",       name: "La Chiva",       color: "#c77dff", kind: "horns",
+    personality: "shy",       scatter: { x: 2,  y: 27 }, speed: 5.75, release: 10.5 },
+  { id: "mohan",       name: "El Mohán",       color: "#7dff8a", kind: "antenna",
+    personality: "wander",    scatter: { x: 25, y: 15 }, speed: 5.6,  release: 13.5 }
+];
+
+let ghosts = [];
+
+/* ------------------------- ESTADO DEL JUEGO ------------------------- */
+let state = "title";         // title | ready | playing | paused | dying | levelclear | gameover
+let stateTimer = 0;
+let score = 0, best = 0, lives = 3, level = 1, fruitEaten = 0;
+let modeIndex = 0, modeTimer = 0, chaseMode = false;
+let frightTimer = 0, frightTotal = 0, ghostChain = 0;
+let fruit = null, fruitTimer = 0;
+let popups = [], particles = [];
+let banner = null;
+let soundOn = true;
+let animClock = 0;
+
+const MODE_TABLE = [9, 20, 7, 20, 6, 20, 5, Infinity];
+
+try { best = parseInt(localStorage.getItem("mythpac_best") || "0", 10) || 0; } catch (e) { best = 0; }
+
+/* ------------------------- AUDIO ------------------------- */
+let actx = null;
+function audio() {
+  if (!actx) {
+    try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { actx = null; }
+  }
+  if (actx && actx.state === "suspended") actx.resume();
+  return actx;
+}
+function tone(freq, dur, type = "square", vol = 0.035, toFreq = null) {
+  if (!soundOn) return;
+  const a = audio(); if (!a) return;
+  const t = a.currentTime;
+  const o = a.createOscillator(), g = a.createGain();
+  o.type = type;
+  o.frequency.setValueAtTime(freq, t);
+  if (toFreq) o.frequency.exponentialRampToValueAtTime(Math.max(30, toFreq), t + dur);
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(a.destination);
+  o.start(t); o.stop(t + dur + 0.02);
+}
+let chompFlip = false;
+function sfxChomp() { chompFlip = !chompFlip; tone(chompFlip ? 240 : 170, 0.05, "square", 0.024); }
+function sfxPower() { tone(220, 0.26, "sawtooth", 0.04, 620); }
+function sfxGhost() { tone(380, 0.09, "square", 0.04, 900); setTimeout(() => tone(700, 0.12, "square", 0.035, 1200), 80); }
+function sfxDeath() { tone(520, 0.7, "sawtooth", 0.05, 70); }
+function sfxLevel() { [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => tone(f, 0.16, "triangle", 0.045), i * 110)); }
+function sfxFruit() { tone(880, 0.1, "triangle", 0.05, 1320); }
+
+/* ------------------------- MOVIMIENTO ------------------------- */
+function canEnterPac(nx, ny) {
+  if (ny < 0 || ny >= ROWS) return false;
+  nx = wrapX(nx);
+  if (walls[ny][nx]) return false;
+  if (doors[ny][nx] || houses[ny][nx]) return false;
+  return true;
+}
+
+function canEnterGhost(g, nx, ny) {
+  if (ny < 0 || ny >= ROWS) return false;
+  nx = wrapX(nx);
+  if (walls[ny][nx]) return false;
+  const special = g.mode === "eaten" || g.mode === "entering" || g.mode === "leaving";
+  if (doors[ny][nx] || houses[ny][nx]) return special;
+  return true;
+}
+
+function advance(ent, dist, onCenter, canEnter) {
+  let guard = 0;
+  while (dist > 1e-9 && guard++ < 80) {
+    if (ent.prog === 0) {
+      let v = DIRV[ent.dir];
+      if (!canEnter(ent.tx + v.x, ent.ty + v.y)) {
+        onCenter();                                   // intenta corregir el rumbo
+        v = DIRV[ent.dir];
+        if (!canEnter(ent.tx + v.x, ent.ty + v.y)) break;
+      }
+    }
+    const room = 1 - ent.prog;
+    const mv = Math.min(room, dist);
+    ent.prog += mv;
+    dist -= mv;
+    if (ent.prog >= 1 - 1e-9) {
+      const v = DIRV[ent.dir];
+      ent.tx = wrapX(ent.tx + v.x);
+      ent.ty = ent.ty + v.y;
+      ent.prog = 0;
+      onCenter();
+    }
+  }
+}
+
+function reverseEntity(e) {
+  if (e.prog > 0) {
+    const v = DIRV[e.dir];
+    e.tx = wrapX(e.tx + v.x);
+    e.ty = e.ty + v.y;
+    e.prog = 1 - e.prog;
+  }
+  e.dir = OPP[e.dir];
+}
+
+/* ------------------------- PAC-MAN ------------------------- */
+function pacCenter() {
+  if (!pac.desired) return;
+  const v = DIRV[pac.desired];
+  if (canEnterPac(pac.tx + v.x, pac.ty + v.y)) {
+    pac.dir = pac.desired;
+    pac.desired = null;
+  }
+}
+
+function setDesired(d) {
+  pac.desired = d;
+  if (pac.prog > 0) {
+    if (d === OPP[pac.dir]) reverseEntity(pac);
+  } else {
+    const v = DIRV[d];
+    if (canEnterPac(pac.tx + v.x, pac.ty + v.y)) { pac.dir = d; pac.desired = null; }
+  }
+}
+
+function updatePac(dt) {
+  const speed = pac.speed * (frightTimer > 0 ? 1.06 : 1);
+  advance(pac, speed * dt, pacCenter, canEnterPac);
+  pac.mouth = Math.abs(Math.sin(animClock * 9)) * 0.32;
+}
+
+/* ------------------------- FANTASMAS ------------------------- */
+function makeGhosts() {
+  const homeSlots = [
+    { x: 13, y: 17 },
+    { x: 14, y: 17 },
+    { x: 12, y: 18 },
+    { x: 15, y: 18 },
+    { x: 13, y: 18 }
+  ];
+  ghosts = GHOST_DEFS.map((d, i) => {
+    const slot = homeSlots[i];
+    return {
+      ...d,
+      tx: slot.x, ty: slot.y, prog: 0,
+      dir: "up",
+      mode: "house",
+      fright: false,
+      houseTimer: d.release,
+      wanderTarget: { x: 13, y: 15 },
+      wanderClock: 0
+    };
+  });
+}
+
+function ghostTarget(g) {
+  if (!chaseMode) return g.scatter;
+  switch (g.personality) {
+    case "chaser":
+      return { x: pac.tx, y: pac.ty };
+    case "ambusher": {
+      const v = DIRV[pac.dir];
+      return { x: pac.tx + v.x * 4, y: pac.ty + v.y * 4 };
+    }
+    case "flanker": {
+      const v = DIRV[pac.dir];
+      const bl = ghosts[0];
+      const ax = pac.tx + v.x * 2, ay = pac.ty + v.y * 2;
+      return { x: ax * 2 - bl.tx, y: ay * 2 - bl.ty };
+    }
+    case "shy": {
+      const d = Math.hypot(pac.tx - g.tx, pac.ty - g.ty);
+      return d > 8 ? { x: pac.tx, y: pac.ty } : g.scatter;
+    }
+    case "wander":
+    default:
+      return g.wanderTarget;
+  }
+}
+
+function chooseActiveDir(g) {
+  const target = g.fright ? null : ghostTarget(g);
+  const options = [];
+
+  for (const d of DIR_ORDER) {
+    if (!g.fright && d === OPP[g.dir]) continue;
+    const v = DIRV[d];
+    if (!canEnterGhost(g, g.tx + v.x, g.ty + v.y)) continue;
+    options.push(d);
+  }
+
+  if (!options.length) {
+    // callejón sin salida: dar la vuelta
+    if (canEnterGhost(g, g.tx + DIRV[OPP[g.dir]].x, g.ty + DIRV[OPP[g.dir]].y)) {
+      g.dir = OPP[g.dir];
+    }
+    return;
+  }
+
+  if (g.fright) {
+    g.dir = options[Math.floor(Math.random() * options.length)];
+    return;
+  }
+
+  let bestDir = options[0], bestDist = Infinity;
+  for (const d of options) {
+    const v = DIRV[d];
+    const nx = wrapX(g.tx + v.x), ny = g.ty + v.y;
+    const dx = nx - target.x, dy = ny - target.y;
+    const dist = dx * dx + dy * dy;
+    if (dist < bestDist) { bestDist = dist; bestDir = d; }
+  }
+  g.dir = bestDir;
+}
+
+// BFS: distancia de cada casilla al punto de salida de la casa
+let homeDist = null;
+function buildHomeDist() {
+  homeDist = new Int32Array(COLS * ROWS).fill(-1);
+  const sx = HOUSE_EXIT.x, sy = HOUSE_EXIT.y;
+  const q = [[sx, sy]];
+  homeDist[sy * COLS + sx] = 0;
+  for (let i = 0; i < q.length; i++) {
+    const [x, y] = q[i];
+    const d = homeDist[y * COLS + x];
+    for (const k in DIRV) {
+      const v = DIRV[k];
+      const nx = x + v.x, ny = y + v.y;
+      if (ny < 0 || ny >= ROWS) continue;
+      const wx = wrapX(nx);
+      if (walls[ny][wx] || doors[ny][wx] || houses[ny][wx]) continue;
+      const idx = ny * COLS + wx;
+      if (homeDist[idx] !== -1) continue;
+      homeDist[idx] = d + 1;
+      q.push([wx, ny]);
+    }
+  }
+}
+
+function chooseEatenDir(g) {
+  if (g.tx === HOUSE_EXIT.x && g.ty === HOUSE_EXIT.y) {
+    g.mode = "entering";
+    g.dir = "down";
+    return;
+  }
+  const cur = homeDist[g.ty * COLS + g.tx];
+  let bestDir = null, best = cur === -1 ? Infinity : cur;
+  for (const d of DIR_ORDER) {
+    const v = DIRV[d];
+    const ny = g.ty + v.y;
+    if (ny < 0 || ny >= ROWS) continue;
+    const nx = wrapX(g.tx + v.x);
+    if (walls[ny][nx] || doors[ny][nx] || houses[ny][nx]) continue;
+    const val = homeDist[ny * COLS + nx];
+    if (val !== -1 && val < best) { best = val; bestDir = d; }
+  }
+  if (bestDir) g.dir = bestDir;
+}
+
+function ghostCenter(g) {
+  if (g.mode === "house") return;
+  if (g.mode === "eaten") { chooseEatenDir(g); return; }
+  if (g.mode === "entering") {
+    if (g.ty >= HOUSE_CENTER.y) {
+      g.mode = "house";
+      g.fright = false;
+      g.houseTimer = 1.1;
+      g.dir = "up";
+      return;
+    }
+    g.dir = "down";
+    return;
+  }
+  if (g.mode === "leaving") {
+    if (g.ty <= HOUSE_EXIT.y) { g.mode = "active"; chooseActiveDir(g); return; }
+    if (g.tx < HOUSE_CENTER.x) g.dir = "right";
+    else if (g.tx > HOUSE_CENTER.x) g.dir = "left";
+    else g.dir = "up";
+    return;
+  }
+  chooseActiveDir(g);
+}
+
+function ghostSpeed(g) {
+  if (g.mode === "eaten" || g.mode === "entering") return 13;
+  if (g.mode === "leaving") return 4.2;
+  if (g.mode === "house") return 0;
+  let s = g.speed + (level - 1) * 0.1;
+  if (g.fright) s = 3.3;
+  if (g.id === "chupacabras" && !g.fright) s += 0.12;
+  return Math.min(s, 8.4);
+}
+
+function updateGhosts(dt) {
+  for (const g of ghosts) {
+    if (g.mode === "house") {
+      g.houseTimer -= dt;
+      if (g.houseTimer <= 0) { g.mode = "leaving"; }
+      continue;
+    }
+    const sp = ghostSpeed(g);
+    advance(g, sp * dt, () => ghostCenter(g), (nx, ny) => canEnterGhost(g, nx, ny));
+  }
+}
+
+/* ------------------------- COLISIONES ------------------------- */
+function entityPos(e) {
+  const v = DIRV[e.dir] || { x: 0, y: 0 };
+  return {
+    x: (e.tx + 0.5 + v.x * e.prog) * TILE,
+    y: (e.ty + 0.5 + v.y * e.prog) * TILE
+  };
+}
+
+function checkCollisions() {
+  const p = entityPos(pac);
+  for (const g of ghosts) {
+    if (g.mode !== "active") continue;
+    const gp = entityPos(g);
+    const dx = gp.x - p.x, dy = gp.y - p.y;
+    if (dx * dx + dy * dy > (TILE * 0.62) * (TILE * 0.62)) continue;
+
+    if (g.fright) {
+      ghostChain++;
+      const pts = 200 * Math.pow(2, Math.min(ghostChain - 1, 3));
+      addScore(pts, gp.x / TILE - 0.5, gp.y / TILE - 0.5);
+      popups.push({ x: gp.x, y: gp.y, text: "+" + pts, t: 1, color: "#7df9ff", vy: -26 });
+      for (let i = 0; i < 16; i++) {
+        particles.push({
+          x: gp.x, y: gp.y,
+          vx: (Math.random() - 0.5) * 190, vy: (Math.random() - 0.5) * 190 - 30,
+          life: 0.7, max: 0.7, color: g.color, r: 1.5 + Math.random() * 2.5
+        });
+      }
+      g.mode = "eaten";
+      g.fright = false;
+      sfxGhost();
+      toast("¡" + g.name + " atrapado!", g.color);
+    } else {
+      die();
+      return;
+    }
+  }
+}
+
+function die() {
+  state = "dying";
+  stateTimer = 1.7;
+  pac.deathT = 0;
+  sfxDeath();
+  for (let i = 0; i < 26; i++) {
+    particles.push({
+      x: (pac.tx + 0.5) * TILE, y: (pac.ty + 0.5) * TILE,
+      vx: (Math.random() - 0.5) * 230, vy: (Math.random() - 0.5) * 230 - 40,
+      life: 0.9, max: 0.9, color: i % 2 ? "#ffd24d" : "#ff9f1c", r: 2 + Math.random() * 2.5
+    });
+  }
+}
+
+/* ------------------------- COMIDA / NIVELES ------------------------- */
+function addScore(n, tileX, tileY) {
+  score += n;
+  if (score > best) {
+    best = score;
+    try { localStorage.setItem("mythpac_best", String(best)); } catch (e) {}
+  }
+  updateHUD();
+}
+
+function eatDots() {
+  const t = dots[pac.ty] && dots[pac.ty][pac.tx];
+  if (!t) return;
+
+  dots[pac.ty][pac.tx] = 0;
+  dotsLeft--; eatenDots++;
+
+  const px = (pac.tx + 0.5) * TILE, py = (pac.ty + 0.5) * TILE;
+
+  if (t === 1) {
+    addScore(10);
+    sfxChomp();
+    if (eatenDots % 100 === 0) spawnFruit();
+  } else {
+    addScore(50);
+    startFright();
+    sfxPower();
+    popups.push({ x: px, y: py, text: "¡50!", t: 0.9, color: "#ffd24d", vy: -30 });
+  }
+
+  if (dotsLeft <= 0) {
+    state = "levelclear";
+    stateTimer = 2.4;
+    banner = { text: "¡Valle liberado!", sub: "Nivel " + level + " completado", t: 2.4, color: "#7dff8a" };
+    sfxLevel();
+  }
+  updateHUD();
+}
+
+function startFright() {
+  frightTotal = Math.max(2.2, 8 - (level - 1) * 0.55);
+  frightTimer = frightTotal;
+  ghostChain = 0;
+  for (const g of ghosts) {
+    if (g.mode === "active" && !g.fright) {
+      g.fright = true;
+      reverseEntity(g);
+    }
+  }
+  toast("¡El Dorado! Come espíritus", "#ffd24d");
+}
+
+function spawnFruit() {
+  fruit = {
+    x: FRUIT_TILE.x, y: FRUIT_TILE.y,
+    item: OFRENDAS[Math.min(level - 1, OFRENDAS.length - 1)],
+    prog: 0
+  };
+  fruitTimer = 9.5;
+  toast("Ofrenda ritual en el valle", "#ffe066");
+}
+
+function eatFruit() {
+  if (!fruit) return;
+  if (pac.tx !== fruit.x || pac.ty !== fruit.y) return;
+
+  const item = fruit.item;
+  addScore(item.points);
+  fruitEaten++;
+  popups.push({
+    x: (fruit.x + 0.5) * TILE, y: (fruit.y + 0.4) * TILE,
+    text: item.icon + " +" + item.points, t: 1.4, color: "#ffe066", vy: -34
+  });
+  toast(item.name + "  +" + item.points, "#ffe066");
+  sfxFruit();
+  fruit = null;
+  fruitTimer = 0;
+  updateHUD();
+}
+
+/* ------------------------- PAUSAS Y FIN ------------------------- */
+function afterDeath() {
+  lives--;
+  updateHUD();
+  if (lives <= 0) {
+    state = "gameover";
+    showOverlay(
+      "Fin del mito",
+      "Puntaje: <b>" + score + "</b> · Récord: <b>" + best + "</b><br><br>Los espíritus del valle se quedaron con tu alma. ¿Volverás a intentarlo?",
+      "Reintentar"
+    );
+  } else {
+    resetActors();
+    state = "ready";
+    stateTimer = 1.6;
+    banner = { text: "¡Cuidado!", sub: "El Chupacabras te encontró", t: 1.4, color: "#ff4d6d" };
+  }
+}
+
+function nextLevel() {
+  level++;
+  buildPellets();
+  resetActors();
+  state = "ready";
+  stateTimer = 1.8;
+  banner = { text: "Nivel " + level, sub: "El valle se oscurece...", t: 1.6, color: "#ffd24d" };
+  updateHUD();
+}
+
+function resetActors() {
+  pac.tx = PAC_START.x; pac.ty = PAC_START.y;
+  pac.dir = PAC_START.dir; pac.desired = null;
+  pac.prog = 0; pac.mouth = 0; pac.deathT = 0;
+  makeGhosts();
+  modeIndex = 0; modeTimer = MODE_TABLE[0]; chaseMode = false;
+  frightTimer = 0; frightTotal = 0; ghostChain = 0;
+  fruit = null; fruitTimer = 0;
+  popups = []; particles = [];
+}
+
+function buildPellets() {
+  for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) {
+    const c = MAP[y][x];
+    dots[y][x] = c === "." ? 1 : c === "o" ? 2 : 0;
+  }
+  totalDots = countDots();
+  dotsLeft = totalDots;
+  eatenDots = 0;
+}
+
+function newGame() {
+  score = 0; lives = 3; level = 1; fruitEaten = 0;
+  buildPellets();
+  resetActors();
+  updateHUD();
+  state = "ready";
+  stateTimer = 2.1;
+  banner = { text: "Nivel 1", sub: "Que los espíritus te teman", t: 1.7, color: "#ffd24d" };
+  hideOverlay();
+  audio();
+}
+
+/* ------------------------- BUCLE ------------------------- */
+function update(dt) {
+  animClock += dt;
+
+  // partículas y textos flotantes siempre vivos
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 240 * dt;
+    p.life -= dt;
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+  for (let i = popups.length - 1; i >= 0; i--) {
+    const p = popups[i];
+    p.y += (p.vy || -22) * dt;
+    p.t -= dt;
+    if (p.t <= 0) popups.splice(i, 1);
+  }
+  if (banner) { banner.t -= dt; if (banner.t <= 0) banner = null; }
+
+  if (state === "ready") {
+    stateTimer -= dt;
+    if (stateTimer <= 0) state = "playing";
+    return;
+  }
+  if (state === "dying") {
+    stateTimer -= dt;
+    pac.deathT += dt;
+    if (stateTimer <= 0) afterDeath();
+    return;
+  }
+  if (state === "levelclear") {
+    stateTimer -= dt;
+    if (stateTimer <= 0) nextLevel();
+    return;
+  }
+  if (state !== "playing") return;
+
+  // reloj de modos scatter/chase
+  if (frightTimer <= 0) {
+    modeTimer -= dt;
+    if (modeTimer <= 0) {
+      modeIndex = Math.min(modeIndex + 1, MODE_TABLE.length - 1);
+      modeTimer = MODE_TABLE[modeIndex];
+      chaseMode = modeIndex % 2 === 1;
+      if (modeIndex >= 3) chaseMode = true;
+      // los fantasmas invierten al cambiar de modo
+      for (const g of ghosts) if (g.mode === "active" && !g.fright) reverseEntity(g);
+    }
+  } else {
+    frightTimer -= dt;
+    if (frightTimer <= 0) {
+      frightTimer = 0;
+      for (const g of ghosts) g.fright = false;
+      ghostChain = 0;
+    }
+  }
+
+  updatePac(dt);
+  eatDots();
+  updateGhosts(dt);
+  if (state !== "playing") return;
+
+  // fruta
+  if (fruit) {
+    fruit.prog += dt;
+    eatFruit();
+    fruitTimer -= dt;
+    if (fruitTimer <= 0) fruit = null;
+  }
+
+  // objetivo errante del Mohán
+  for (const g of ghosts) {
+    if (g.personality === "wander" && g.mode === "active") {
+      g.wanderClock -= dt;
+      if (g.wanderClock <= 0) {
+        g.wanderClock = 2.2;
+        g.wanderTarget = {
+          x: Math.floor(Math.random() * COLS),
+          y: Math.floor(Math.random() * ROWS)
+        };
+      }
+    }
+  }
+
+  checkCollisions();
+}
+
+let last = 0;
+function loop(ts) {
+  requestAnimationFrame(loop);
+  if (!last) last = ts;
+  let dt = (ts - last) / 1000;
+  last = ts;
+  dt = Math.min(dt, 0.05);
+  update(dt);
+  render();
+}
+
+/* ------------------------- RENDER DEL LABERINTO ------------------------- */
+let mazeCanvas = null;
+
+function buildMazeCanvas() {
+  mazeCanvas = document.createElement("canvas");
+  mazeCanvas.width = W;
+  mazeCanvas.height = H;
+  const c = mazeCanvas.getContext("2d");
+
+  // fondo
+  const bg = c.createRadialGradient(W / 2, H / 2, 40, W / 2, H / 2, H * 0.72);
+  bg.addColorStop(0, "#0a0620");
+  bg.addColorStop(1, "#04020c");
+  c.fillStyle = bg;
+  c.fillRect(0, 0, W, H);
+
+  // relleno de los muros
+  const shades = ["#251a4f", "#2b1f5a", "#221747", "#2f2363", "#271c53"];
+  for (let y = 0; y < ROWS; y++) {
+    for (let x = 0; x < COLS; x++) {
+      if (!walls[y][x]) continue;
+      const px = x * TILE, py = y * TILE;
+      const g = c.createLinearGradient(px, py, px + TILE * 0.4, py + TILE);
+      g.addColorStop(0, shades[(x * 7 + y * 13) % shades.length]);
+      g.addColorStop(1, "#150d31");
+      c.fillStyle = g;
+      c.fillRect(px, py, TILE, TILE);
+    }
+  }
+
+  // vetas de piedra
+  c.globalAlpha = 0.13;
+  c.fillStyle = "#7e63d8";
+  for (let y = 0; y < ROWS; y++) {
+    for (let x = 0; x < COLS; x++) {
+      if (!walls[y][x]) continue;
+      const px = x * TILE, py = y * TILE;
+      c.fillRect(px + 4, py + 6 + ((x * 5 + y * 3) % 10), 9, 2);
+      c.fillRect(px + 12, py + 15 - ((x * 3 + y) % 6), 7, 2);
+    }
+  }
+  c.globalAlpha = 1;
+
+  // bordes luminosos
+  c.lineCap = "round";
+  c.lineJoin = "round";
+  c.shadowColor = "rgba(122,86,255,0.85)";
+  c.shadowBlur = 7;
+  c.strokeStyle = "#6f52e8";
+  c.lineWidth = 2;
+
+  for (let y = 0; y < ROWS; y++) {
+    for (let x = 0; x < COLS; x++) {
+      if (!walls[y][x]) continue;
+      const px = x * TILE, py = y * TILE;
+      const sides = [
+        [0, -1, px, py, px + TILE, py],
+        [0, 1, px, py + TILE, px + TILE, py + TILE],
+        [-1, 0, px, py, px, py + TILE],
+        [1, 0, px + TILE, py, px + TILE, py + TILE]
+      ];
+      for (const [dx, dy, x1, y1, x2, y2] of sides) {
+        if (wallAtDraw(x + dx, y + dy)) continue;
+        c.beginPath();
+        c.moveTo(x1, y1);
+        c.lineTo(x2, y2);
+        c.stroke();
+      }
+    }
+  }
+
+  // acento dorado en los bordes superiores
+  c.shadowBlur = 4;
+  c.shadowColor = "rgba(255,200,90,0.7)";
+  c.strokeStyle = "rgba(255,205,90,0.35)";
+  c.lineWidth = 1;
+  for (let y = 0; y < ROWS; y++) {
+    for (let x = 0; x < COLS; x++) {
+      if (!walls[y][x]) continue;
+      if (wallAtDraw(x, y - 1)) continue;
+      const px = x * TILE, py = y * TILE;
+      c.beginPath();
+      c.moveTo(px + 1, py + 1.5);
+      c.lineTo(px + TILE - 1, py + 1.5);
+      c.stroke();
+    }
+  }
+  c.shadowBlur = 0;
+}
+
+/* ------------------------- DIBUJO DE ENTIDADES ------------------------- */
+function drawPac(px, py, radius, dir, mouth, powered) {
+  const base = { right: 0, down: Math.PI / 2, left: Math.PI, up: -Math.PI / 2 }[dir] || 0;
+  const m = Math.max(0.04, mouth);
+
+  ctx.save();
+  ctx.translate(px, py);
+
+  // resplandor
+  ctx.shadowColor = powered ? "rgba(180,230,255,0.95)" : "rgba(255,200,60,0.85)";
+  ctx.shadowBlur = 16;
+
+  const grad = ctx.createRadialGradient(-radius * 0.3, -radius * 0.35, 1, 0, 0, radius * 1.15);
+  if (powered) {
+    grad.addColorStop(0, "#ffffff");
+    grad.addColorStop(0.5, "#b9e7ff");
+    grad.addColorStop(1, "#4dd2ff");
+  } else {
+    grad.addColorStop(0, "#fff4c2");
+    grad.addColorStop(0.55, "#ffd24d");
+    grad.addColorStop(1, "#ff9f1c");
+  }
+
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.arc(0, 0, radius, base + m, base + Math.PI * 2 - m);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // borde
+  ctx.lineWidth = 1.2;
+  ctx.strokeStyle = powered ? "rgba(255,255,255,0.9)" : "rgba(120,60,0,0.5)";
+  ctx.stroke();
+
+  // ojo
+  const ex = Math.cos(base + Math.PI / 2) * radius * 0.0 + Math.cos(base) * radius * 0.28;
+  const ey = Math.sin(base) * radius * 0.28;
+  ctx.beginPath();
+  ctx.arc(ex - radius * 0.1, ey - radius * 0.42, radius * 0.13, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(40,20,0,0.85)";
+  ctx.fill();
+
+  // pluma del chamán
+  ctx.beginPath();
+  ctx.moveTo(radius * 0.05, -radius * 0.92);
+  ctx.quadraticCurveTo(radius * 0.55, -radius * 1.55, radius * 0.12, -radius * 1.9);
+  ctx.quadraticCurveTo(radius * 0.35, -radius * 1.45, -radius * 0.08, -radius * 0.92);
+  ctx.closePath();
+  ctx.fillStyle = "#ff4d6d";
+  ctx.fill();
+  ctx.strokeStyle = "rgba(255,200,200,0.7)";
+  ctx.lineWidth = 0.8;
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function ghostBody(px, py, r, color, bob) {
+  const top = py - r + bob;
+  ctx.beginPath();
+  ctx.arc(px, top + r * 0.92, r, Math.PI, 0);
+  ctx.lineTo(px + r, py + r * 0.72 + bob);
+
+  const feet = 4;
+  const step = (r * 2) / feet;
+  for (let i = 0; i < feet; i++) {
+    const x1 = px + r - step * i;
+    const x2 = x1 - step;
+    const dip = (i % 2 === 0) ? r * 0.34 : r * 0.02;
+    ctx.quadraticCurveTo(x1 - step * 0.25, py + r * 0.72 + bob + dip,
+                         x2, py + r * 0.72 + bob);
+  }
+  ctx.lineTo(px - r, top + r * 0.92);
+  ctx.closePath();
+
+  const g = ctx.createLinearGradient(px, top, px, py + r);
+  g.addColorStop(0, color);
+  g.addColorStop(1, shade(color, -0.42));
+  ctx.fillStyle = g;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 13;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+}
+
+function shade(hex, amt) {
+  const n = parseInt(hex.slice(1), 16);
+  let r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  r = Math.max(0, Math.min(255, Math.round(r * (1 + amt))));
+  g = Math.max(0, Math.min(255, Math.round(g * (1 + amt))));
+  b = Math.max(0, Math.min(255, Math.round(b * (1 + amt))));
+  return "rgb(" + r + "," + g + "," + b + ")";
+}
+
+function ghostEyes(px, py, r, dir, mode) {
+  const v = DIRV[dir] || { x: 0, y: 0 };
+  if (mode === "fright") {
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath(); ctx.arc(px - r * 0.33, py - r * 0.18, r * 0.17, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(px + r * 0.33, py - r * 0.18, r * 0.17, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    for (let i = 0; i < 5; i++) {
+      const x = px - r * 0.6 + i * r * 0.3;
+      ctx.moveTo(x, py + r * 0.34);
+      ctx.lineTo(x + r * 0.14, py + r * 0.55);
+      ctx.lineTo(x + r * 0.28, py + r * 0.34);
+    }
+    ctx.stroke();
+    return;
+  }
+  const eyeR = r * 0.3;
+  const ox = r * 0.34;
+  for (const s of [-1, 1]) {
+    ctx.beginPath();
+    ctx.ellipse(px + s * ox, py - r * 0.12, eyeR, eyeR * 1.2, 0, 0, Math.PI * 2);
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+  }
+  ctx.fillStyle = "#1b1030";
+  for (const s of [-1, 1]) {
+    ctx.beginPath();
+    ctx.arc(px + s * ox + v.x * eyeR * 0.5, py - r * 0.12 + v.y * eyeR * 0.55, eyeR * 0.52, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function ghostDeco(g, px, py, r, bob, t) {
+  const top = py - r + bob;
+  ctx.save();
+  if (g.kind === "spike") {
+    // púas del chupacabras
+    ctx.fillStyle = "#ffd24d";
+    for (let i = -2; i <= 2; i++) {
+      ctx.beginPath();
+      ctx.moveTo(px + i * r * 0.34 - r * 0.11, top + r * 0.25);
+      ctx.lineTo(px + i * r * 0.34, top - r * 0.42 + Math.abs(i) * r * 0.09);
+      ctx.lineTo(px + i * r * 0.34 + r * 0.11, top + r * 0.25);
+      ctx.closePath();
+      ctx.fill();
+    }
+    // colmillos
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.moveTo(px - r * 0.22, py + r * 0.22);
+    ctx.lineTo(px - r * 0.1, py + r * 0.5);
+    ctx.lineTo(px + r * 0.02, py + r * 0.22);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(px + r * 0.1, py + r * 0.22);
+    ctx.lineTo(px + r * 0.22, py + r * 0.5);
+    ctx.lineTo(px + r * 0.34, py + r * 0.22);
+    ctx.closePath(); ctx.fill();
+  } else if (g.kind === "hair") {
+    // cabellera de la cueruda
+    ctx.strokeStyle = "#ffcf7a";
+    ctx.lineWidth = 1.6;
+    for (let i = 0; i < 7; i++) {
+      const bx = px - r * 0.78 + (i * r * 1.56) / 6;
+      ctx.beginPath();
+      ctx.moveTo(bx, top + r * 0.5);
+      ctx.quadraticCurveTo(bx + Math.sin(t * 3 + i) * r * 0.4, py + r * 0.2,
+                           bx + Math.sin(t * 2.2 + i * 1.7) * r * 0.5, py + r * 0.95);
+      ctx.stroke();
+    }
+  } else if (g.kind === "hat") {
+    // sombrero puntiagudo del duende
+    ctx.fillStyle = "#2b7fa8";
+    ctx.beginPath();
+    ctx.moveTo(px - r * 0.85, top + r * 0.42);
+    ctx.lineTo(px, top - r * 0.78);
+    ctx.lineTo(px + r * 0.85, top + r * 0.42);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "#4dd2ff";
+    ctx.fillRect(px - r * 0.95, top + r * 0.34, r * 1.9, r * 0.2);
+  } else if (g.kind === "horns") {
+    // cuernos de la chiva
+    ctx.fillStyle = "#e3d1ff";
+    for (const s of [-1, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(px + s * r * 0.55, top + r * 0.36);
+      ctx.quadraticCurveTo(px + s * r * 1.05, top - r * 0.1, px + s * r * 0.72, top - r * 0.55);
+      ctx.quadraticCurveTo(px + s * r * 0.82, top - r * 0.05, px + s * r * 0.28, top + r * 0.2);
+      ctx.closePath();
+      ctx.fill();
+    }
+  } else if (g.kind === "antenna") {
+    // antenas de mohán
+    ctx.strokeStyle = "#b6ffb0";
+    ctx.lineWidth = 1.6;
+    for (const s of [-1, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(px + s * r * 0.4, top + r * 0.35);
+      ctx.quadraticCurveTo(px + s * r * 0.75, top - r * 0.35, px + s * r * 0.5, top - r * 0.72);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(px + s * r * 0.5, top - r * 0.78, r * 0.15, 0, Math.PI * 2);
+      ctx.fillStyle = "#d8ffd4";
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+
+function drawGhost(g, t) {
+  const p = entityPos(g);
+  let bob = 0;
+  if (g.mode === "house") bob = Math.sin(t * 4 + g.tx) * 1.8;
+  const r = TILE * 0.44;
+
+  if (g.mode === "eaten" || g.mode === "entering") {
+    ghostEyes(p.x, p.y, r, g.dir, "normal");
+    return;
+  }
+
+  const fright = g.fright;
+  const blink = frightTimer > 0 && frightTimer < 2.2 && Math.floor(frightTimer * 7) % 2 === 0;
+  const color = fright ? (blink ? "#f4f4ff" : "#2f3fd6") : g.color;
+  const mode = fright ? "fright" : "normal";
+
+  ghostBody(p.x, p.y, r, color, bob);
+  ghostDeco(g, p.x, p.y, r, bob, t);
+  ghostEyes(p.x, p.y, r, g.dir, mode);
+}
+
+/* ------------------------- RENDER PRINCIPAL ------------------------- */
+function render() {
+  ctx.clearRect(0, 0, W, H);
+
+  // laberinto pre-renderizado
+  if (mazeCanvas) ctx.drawImage(mazeCanvas, 0, 0);
+
+  // puerta de la casa
+  ctx.save();
+  ctx.shadowColor = "rgba(255,160,220,0.8)";
+  ctx.shadowBlur = 10;
+  ctx.fillStyle = "#ffb3e6";
+  for (let x = DOOR_TX; x <= DOOR_TX + 1; x++) {
+    ctx.fillRect(x * TILE + 2, DOOR_TY * TILE + TILE / 2 - 2.5, TILE - 4, 5);
+  }
+  ctx.restore();
+
+  // ofrendas
+  for (let y = 0; y < ROWS; y++) {
+    for (let x = 0; x < COLS; x++) {
+      const d = dots[y][x];
+      if (!d) continue;
+      const px = (x + 0.5) * TILE, py = (y + 0.5) * TILE;
+      if (d === 1) {
+        ctx.fillStyle = "#ffe2a8";
+        ctx.beginPath();
+        ctx.arc(px, py, 2.1, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        const pulse = 1 + Math.sin(animClock * 4.4) * 0.16;
+        ctx.save();
+        ctx.shadowColor = "rgba(255,205,80,0.95)";
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = "#ffd24d";
+        ctx.beginPath();
+        ctx.arc(px, py, 5.1 * pulse, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = "#fff6d2";
+        ctx.beginPath();
+        ctx.arc(px - 1.2, py - 1.4, 1.7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+  }
+
+  // ofrenda ritual (fruta)
+  if (fruit) {
+    const px = (fruit.x + 0.5) * TILE, py = (fruit.y + 0.5) * TILE;
+    const bob = Math.sin(animClock * 3.4) * 3;
+    ctx.save();
+    ctx.shadowColor = "rgba(255,215,90,0.9)";
+    ctx.shadowBlur = 16;
+    ctx.beginPath();
+    ctx.arc(px, py + bob, 11, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255,210,90,0.16)";
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.font = "17px serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(fruit.item.icon, px, py + bob);
+    // cronómetro
+    const frac = Math.max(0, fruitTimer / 9.5);
+    ctx.beginPath();
+    ctx.arc(px, py + bob, 13, -Math.PI / 2, -Math.PI / 2 + frac * Math.PI * 2);
+    ctx.strokeStyle = "rgba(255,220,120,0.75)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // fantasmas
+  for (const g of ghosts) drawGhost(g, animClock);
+
+  // chamán
+  if (state !== "gameover") {
+    const p = entityPos(pac);
+    if (state === "dying") {
+      const k = Math.min(1, pac.deathT / 1.15);
+      const rad = TILE * 0.44 * (1 - k);
+      const spin = k * Math.PI * 2.6;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(spin);
+      if (rad > 1.2) {
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, rad, 0.18, Math.PI * 2 - 0.18);
+        ctx.closePath();
+        ctx.fillStyle = "#ffd24d";
+        ctx.shadowColor = "rgba(255,190,50,0.9)";
+        ctx.shadowBlur = 18;
+        ctx.fill();
+      }
+      ctx.restore();
+    } else {
+      drawPac(p.x, p.y, TILE * 0.44, pac.dir, pac.mouth, frightTimer > 0);
+    }
+  }
+
+  // partículas
+  for (const p of particles) {
+    ctx.globalAlpha = Math.max(0, p.life / p.max);
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  // textos flotantes
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  for (const p of popups) {
+    ctx.globalAlpha = Math.min(1, p.t * 1.6);
+    ctx.font = "bold 13px 'Trebuchet MS', sans-serif";
+    ctx.fillStyle = "#0a0518";
+    ctx.fillText(p.text, p.x + 1.5, p.y + 1.5);
+    ctx.fillStyle = p.color || "#9fe7ff";
+    ctx.fillText(p.text, p.x, p.y);
+  }
+  ctx.globalAlpha = 1;
+
+  // banner de nivel
+  if (banner) {
+    const k = Math.min(1, (banner.t) / 0.25);
+    ctx.globalAlpha = Math.min(1, banner.t * 2) * k;
+    ctx.font = "bold 34px 'Trebuchet MS', sans-serif";
+    ctx.fillStyle = "rgba(4,2,12,0.75)";
+    ctx.fillRect(0, H / 2 - 52, W, 104);
+    ctx.fillStyle = banner.color;
+    ctx.shadowColor = banner.color;
+    ctx.shadowBlur = 24;
+    ctx.fillText(banner.text, W / 2, H / 2 - 10);
+    ctx.shadowBlur = 0;
+    ctx.font = "14px 'Trebuchet MS', sans-serif";
+    ctx.fillStyle = "#d9ccff";
+    ctx.fillText(banner.sub, W / 2, H / 2 + 28);
+    ctx.globalAlpha = 1;
+  }
+
+  // viñeta
+  const vg = ctx.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, H * 0.78);
+  vg.addColorStop(0, "rgba(0,0,0,0)");
+  vg.addColorStop(1, "rgba(0,0,0,0.55)");
+  ctx.fillStyle = vg;
+  ctx.fillRect(0, 0, W, H);
+}
+
+/* ------------------------- HUD / OVERLAY ------------------------- */
+const sPts = document.getElementById("sPts");
+const sBest = document.getElementById("sBest");
+const sLives = document.getElementById("sLives");
+const sLvl = document.getElementById("sLvl");
+const sFruit = document.getElementById("sFruit");
+const sLeft = document.getElementById("sLeft");
+const lvlBar = document.getElementById("lvlBar");
+
+function updateHUD() {
+  sPts.textContent = score.toLocaleString("es-CO");
+  sBest.textContent = best.toLocaleString("es-CO");
+  sLives.textContent = Math.max(0, lives);
+  sLvl.textContent = level;
+  sFruit.textContent = fruitEaten;
+  sLeft.textContent = Math.max(0, dotsLeft);
+  lvlBar.style.width = Math.min(100, (eatenDots / Math.max(1, totalDots)) * 100) + "%";
+}
+
+const overlay = document.getElementById("overlay");
+const ovTitle = document.getElementById("ovTitle");
+const ovText = document.getElementById("ovText");
+const ovBtn = document.getElementById("ovBtn");
+
+function showOverlay(title, html, btn) {
+  ovTitle.textContent = title;
+  ovText.innerHTML = html;
+  ovBtn.textContent = btn || "Jugar";
+  overlay.classList.remove("hidden");
+}
+function hideOverlay() { overlay.classList.add("hidden"); }
+
+const toastEl = document.getElementById("toast");
+let toastTimeout = null;
+function toast(text, color) {
+  if (!toastEl) return;
+  toastEl.textContent = text;
+  toastEl.style.color = color || "#fff";
+  toastEl.style.textShadow = "0 0 18px " + (color || "#fff") + ", 0 3px 0 rgba(0,0,0,.6)";
+  toastEl.classList.add("show");
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => toastEl.classList.remove("show"), 1500);
+}
+
+/* ------------------------- BOTONES E INPUT ------------------------- */
+ovBtn.addEventListener("click", () => {
+  if (state === "paused") { resume(); return; }
+  newGame();
+});
+
+document.getElementById("btnPause").addEventListener("click", togglePause);
+const btnMute = document.getElementById("btnMute");
+btnMute.addEventListener("click", () => {
+  soundOn = !soundOn;
+  btnMute.textContent = soundOn ? "🔊 Sonido" : "🔇 Silencio";
+  if (soundOn) tone(660, 0.09, "triangle", 0.04);
+});
+
+function togglePause() {
+  if (state === "playing") {
+    state = "paused";
+    showOverlay("Pausa", "Los espíritus esperan. El valle contiene la respiración...", "Continuar");
+  } else if (state === "paused") {
+    resume();
+  }
+}
+function resume() {
+  hideOverlay();
+  state = "playing";
+}
+
+const KEYMAP = {
+  arrowup: "up", arrowdown: "down", arrowleft: "left", arrowright: "right",
+  w: "up", s: "down", a: "left", d: "right"
+};
+
+window.addEventListener("keydown", (e) => {
+  const k = e.key.toLowerCase();
+  if (KEYMAP[k]) {
+    e.preventDefault();
+    if (state === "playing") setDesired(KEYMAP[k]);
+    else if (state === "title" || state === "gameover") newGame();
+    return;
+  }
+  if (k === "p") { e.preventDefault(); togglePause(); }
+  if (k === "m") { e.preventDefault(); btnMute.click(); }
+  if (k === " " || k === "enter") {
+    e.preventDefault();
+    if (state === "title" || state === "gameover") newGame();
+    else if (state === "paused") resume();
+  }
+});
+
+// D-pad táctil
+document.querySelectorAll(".touch button[data-dir]").forEach((b) => {
+  const d = b.dataset.dir;
+  const fire = (ev) => { ev.preventDefault(); if (state === "playing") setDesired(d); };
+  b.addEventListener("touchstart", fire, { passive: false });
+  b.addEventListener("mousedown", fire);
+});
+
+// deslizar sobre el tablero
+let swipeX = 0, swipeY = 0, swiping = false;
+canvas.addEventListener("touchstart", (e) => {
+  const t = e.touches[0];
+  swipeX = t.clientX; swipeY = t.clientY; swiping = true;
+  if (state === "title" || state === "gameover") newGame();
+}, { passive: true });
+
+canvas.addEventListener("touchmove", (e) => {
+  if (!swiping || state !== "playing") return;
+  const t = e.touches[0];
+  const dx = t.clientX - swipeX, dy = t.clientY - swipeY;
+  if (Math.abs(dx) < 22 && Math.abs(dy) < 22) return;
+  if (Math.abs(dx) > Math.abs(dy)) setDesired(dx > 0 ? "right" : "left");
+  else setDesired(dy > 0 ? "down" : "up");
+  swipeX = t.clientX; swipeY = t.clientY;
+}, { passive: true });
+
+canvas.addEventListener("touchend", () => { swiping = false; }, { passive: true });
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && state === "playing") togglePause();
+});
+
+/* ------------------------- BESTIARIO ------------------------- */
+(function fillBestiary() {
+  const el = document.getElementById("mythList");
+  el.innerHTML = BESTIARY.map(m =>
+    '<div><b>' + m.name + '</b><i>' + m.desc + '</i></div>'
+  ).join("");
+})();
+
+/* ------------------------- ARRANQUE ------------------------- */
+buildMazeCanvas();
+buildHomeDist();
+makeGhosts();
+updateHUD();
+showOverlay(
+  "Mythos Pac",
+  "El Chamán desciende al <b>Valle de las Leyendas</b>.<br>Devora las <b>346 ofrendas</b> esquivando a los espíritus.<br><br><span style='color:#ffd24d'>Las ofrendas doradas</span> te dan el poder de El Dorado.",
+  "Jugar"
+);
+requestAnimationFrame(loop);
+</script>
+
+<!-- PWA: registro del Service Worker (requiere https:// o localhost) -->
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js", { scope: "./" }).then((reg) => {
+      // Si hay una versión nueva del juego, se activa sin esperar.
+      reg.addEventListener("updatefound", () => {
+        const worker = reg.installing;
+        if (!worker) return;
+        worker.addEventListener("statechange", () => {
+          if (worker.state === "installed" && navigator.serviceWorker.controller) {
+            worker.postMessage("SKIP_WAITING");
+          }
+        });
+      });
+    }).catch((err) => {
+      console.warn("Service Worker no registrado:", err);
+    });
+  });
+}
+</script>
+</body>
+</html>
